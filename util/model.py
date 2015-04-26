@@ -1,5 +1,9 @@
 import peewee
-db = peewee.SqliteDatabase('people.db')
+import os
+
+PATH  = os.path.dirname(os.path.realpath(__file__))
+
+db = peewee.SqliteDatabase(os.join(PATH,'people.db'))
 
 class Person(peewee.Model):
     name = peewee.CharField(max_length=100)
@@ -24,10 +28,11 @@ class Consult(peewee.Model):
 class ConsultExt(peewee.Model):
     paciente = peewee.ForeignKeyField(Person)
     doctor = peewee.CharField(max_length=100)
-    sitomas = peewee.CharField(max_length=100)
+    sintomas = peewee.CharField(max_length=100)
     diagnostico = peewee.CharField(max_length=100)
     tratamiento = peewee.CharField(max_length=100)
     notas = peewee.CharField(max_length=100)
+    location = peewee.CharField(max_length=100)
 
     class Meta:
         database = db # This model uses the "people.db" database.

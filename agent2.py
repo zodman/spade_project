@@ -16,7 +16,7 @@ class MyAgent(spade.Agent.Agent):
             # Check wether the message arrived
             if self.msg:
                 print "I got a message!"
-            else:
+            else:w
                 print "I waited but got no message"
 
     class AnotherBehav(spade.Behaviour.Behaviour):

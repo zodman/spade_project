@@ -1,3 +1,6 @@
 [submodule "spade"]
 	path = spade
 	url = https://github.com/javipalanca/spade
+[submodule "cbr"]
+	path = cbr
+	url = https://github.com/zodman/cbr.git

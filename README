@@ -1,0 +1,18 @@
+Agentes Arch.
+
+Comunicación:
+
+---------------------------
+| Yucatan | Campeche | DF |
+---------------------------
+        \    |       /
+        -----------
+        agent_local
+        ------------
+
+Acciones:
+Listar Pacientes
+Agregar consulta
+Modificar Consulta
+
+

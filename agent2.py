@@ -1,54 +1,91 @@
+##################################
+#   EVENTS                                                                #
+##################################
+'''
+This is an example about how to use messages (events)
+to trigger the execution of a behaviour (EventBehaviour)
+'''
+
+import os
+import sys
+import time
+
+sys.path.append('..')
+
 import spade
 
+host = "127.0.0.1"
 
-class MyAgent(spade.Agent.Agent):
 
-    class ReceiveBehav(spade.Behaviour.Behaviour):
+class Sender(spade.Agent.Agent):
 
-        """This behaviour will receive all kind of messages"""
+    def _setup(self):
+		self.addBehaviour(self.SendMsgBehav())
+		print "Agent started!"
+		
+    class SendMsgBehav(spade.Behaviour.OneShotBehaviour):
+        """
+        This behaviour sends a message to this same agent to trigger an EventBehaviour
+        """
 
         def _process(self):
-            self.msg = None
+            msg = spade.ACLMessage.ACLMessage()
+            msg.setPerformative("inform")
+            msg.addReceiver(spade.AID.aid("a@"+host,["xmpp://a@"+host]))
+            msg.setContent("testSendMsg")
+            print "Sending message in 3 . . ."
+            time.sleep(1)
+            print "Sending message in 2 . . ."
+            time.sleep(1)
+            print "Sending message in 1 . . ."
+            time.sleep(1)
 
-            # Blocking receive for 10 seconds
+            self.myAgent.send(msg)
+            
+            print "I sent a message"
+            #print str(msg)
+    
+    class RecvMsgBehav(spade.Behaviour.EventBehaviour):
+        """
+        This EventBehaviour gets launched when a message that matches its template arrives at the agent
+        """
+
+        def _process(self):            
+            print "This behaviour has been triggered by a message!"
             self.msg = self._receive(True, 10)
-
+			
             # Check wether the message arrived
             if self.msg:
                 print "I got a message!"
-            else:w
-                print "I waited but got no message"
-
-    class AnotherBehav(spade.Behaviour.Behaviour):
-
-        """This behaviour will receive only messages of the 'cooking' ontology"""
-
-        def _process(self):
-            self.msg = None
-
-            # Blocking receive indefinitely
-            self.msg = self._receive(True)
-
-            # Check wether the message arrived
-            if self.msg:
-                print "I got a cooking message!"
+                print (self.msg,)
             else:
-                print "I waited but got no cooking message"
-
+                print "I waited but got no message"
+            
+    
     def _setup(self):
-        # Add the "ReceiveBehav" as the default behaviour
-        rb = self.ReceiveBehav()
-        self.setDefaultBehaviour(rb)
-        ab = self.AnotherBehav()
+        # Create the template for the EventBehaviour: a message from myself
+        template = spade.Behaviour.ACLTemplate()
+        template.setSender(spade.AID.aid("a@"+host,["xmpp://a@"+host]))
+        t = spade.Behaviour.MessageTemplate(template)
+        
+        # Add the EventBehaviour with its template
+        self.addBehaviour(self.RecvMsgBehav(),t)
+        
+        # Add the sender behaviour
+        self.addBehaviour(self.SendMsgBehav())
 
-        # Prepare template for "AnotherBehav"
-        cooking_template = spade.Behaviour.ACLTemplate()
-        cooking_template.setOntology("cooking")
-        mt = spade.Behaviour.MessageTemplate(cooking_template)
+    
+a = Sender("a@"+host,"secret")
 
-        # Add the behaviour WITH the template
-        self.addBehaviour(ab, mt)
+time.sleep(1)
+a.start()
 
-if __name__ == "__main__":
-    a = MyAgent("agent@127.0.0.1", "secret")
-    a.start()
+alive = True
+import time
+while alive:
+    try:
+        time.sleep(1)
+    except KeyboardInterrupt:
+        alive=False
+a.stop()
+sys.exit(0)

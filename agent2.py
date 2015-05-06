@@ -1,27 +1,16 @@
-##################################
-#   EVENTS                                                                #
-##################################
-'''
-This is an example about how to use messages (events)
-to trigger the execution of a behaviour (EventBehaviour)
-'''
-
 import os
 import sys
 import time
 
-sys.path.append('..')
-
 import spade
+
+import pprint
+import json
 
 host = "127.0.0.1"
 
-
 class Sender(spade.Agent.Agent):
 
-    def _setup(self):
-		self.addBehaviour(self.SendMsgBehav())
-		print "Agent started!"
 		
     class SendMsgBehav(spade.Behaviour.OneShotBehaviour):
         """
@@ -32,11 +21,8 @@ class Sender(spade.Agent.Agent):
             msg = spade.ACLMessage.ACLMessage()
             msg.setPerformative("inform")
             msg.addReceiver(spade.AID.aid("a@"+host,["xmpp://a@"+host]))
-            msg.setContent("testSendMsg")
-            print "Sending message in 3 . . ."
-            time.sleep(1)
-            print "Sending message in 2 . . ."
-            time.sleep(1)
+            data = {'data':'data1', 'num':1}
+            msg.setContent(data)
             print "Sending message in 1 . . ."
             time.sleep(1)
 
@@ -53,11 +39,10 @@ class Sender(spade.Agent.Agent):
         def _process(self):            
             print "This behaviour has been triggered by a message!"
             self.msg = self._receive(True, 10)
-			
             # Check wether the message arrived
-            if self.msg:
+            if self.msg is not None:
                 print "I got a message!"
-                print (self.msg,)
+                print (self.msg.getContent(),)
             else:
                 print "I waited but got no message"
             

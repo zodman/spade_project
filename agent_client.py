@@ -1,10 +1,14 @@
 import spade
 import time
 import sys
+import terminal as t
+from terminal import log
+
 host = "127.0.0.1"
 
 class Client(spade.Agent.Agent):
     def _setup(self):
+        self.setDebug()
         self.addBehaviour(self.SendMsgBehav())
 		
     class SendMsgBehav(spade.Behaviour.OneShotBehaviour):
@@ -12,26 +16,31 @@ class Client(spade.Agent.Agent):
             msg = spade.ACLMessage.ACLMessage()
             msg.setPerformative("inform")
             msg.addReceiver(spade.AID.aid("yucatan@"+host,["xmpp://yucatan@"+host]))
-            data = {'data':'data1', 'num':1}
+            #data = {'data':'Andres Vargas', 'action':"search"}
+            data = {'data':self.myAgent.data, 'action':self.myAgent.action}
             msg.setContent(data)
-            print "Sending message in 1 . . ."
+            log.info("Sending message in 1 . . .")
             time.sleep(1)
             self.myAgent.send(msg)
+            self.myAgent.stop()
             
-            print "I sent a message"
+            log.info(t.blue("I sent a message"))
 
-a = Client("client@"+host,"secret")
+app = t.Command("client")
+app.option("-d", "debug")
+app.option("-a [action]", "action: search|fetch",)
 
-time.sleep(1)
-a.start()
+@app.action
+def main(debug = False, action="search"):
 
-alive = True
-import time
-while alive:
-    try:
-        time.sleep(1)
-    except KeyboardInterrupt:
-        alive=False
-a.stop()
-sys.exit(0)
+    a = Client("client@"+host,"secret")
+    a.action = action
+    if debug:
+        a.setDebug()
+    data = t.prompt("%s for"% action)
+    a.data = data
+    time.sleep(1)
+    a.start()
+    sys.exit(0)
 
+app.parse()

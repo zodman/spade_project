@@ -1,2 +1,2 @@
-rm *.db
+rm *.db -rf
 python create.py

@@ -1,3 +1,4 @@
+import os
 from model import Person,Consult, ConsultExt, db
 
 def create_tables():

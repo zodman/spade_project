@@ -3,6 +3,9 @@ import time
 import sys
 import json
 from action import Action
+import terminal as t
+
+host = "127.0.0.1"
 
 class AgentBase(spade.Agent.Agent):
     class ReciveBehav(spade.Behaviour.EventBehaviour):
@@ -10,8 +13,9 @@ class AgentBase(spade.Agent.Agent):
             self.msg = self._receive(True, 10)
             content = None
             if self.msg is not None:
-                print "msg recived"
+                t.log.info("msg recived")
                 content = self.msg.getContent()
+                t.log.info(content)
                 act = Action(content)
                 res  = act.execute()
     def _setup(self):
@@ -21,20 +25,26 @@ class AgentBase(spade.Agent.Agent):
         
         self.addBehaviour(self.ReciveBehav(), t)
 
+app = t.Command("main")
+app.option("-d", "debug")
 
-host = "127.0.0.1"
-a = AgentBase("yucatan@"+host,"secret")
+@app.action
+def main(debug=False):
+    a = AgentBase("yucatan@"+host,"secret")
+    if debug:
+        a.setDebug()
 
-time.sleep(1)
-a.start()
+    time.sleep(1)
 
-alive = True
-import time
-while alive:
-    try:
-        time.sleep(1)
-    except KeyboardInterrupt:
-        alive=False
-a.stop()
-sys.exit(0)
+    a.start()
 
+    alive = True
+    while alive:
+        try:
+            time.sleep(1)
+        except KeyboardInterrupt:
+            alive=False
+    a.stop()
+    sys.exit(0)
+
+app.parse()

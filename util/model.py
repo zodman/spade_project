@@ -3,7 +3,7 @@ import os
 
 PATH  = os.path.dirname(os.path.realpath(__file__))
 
-db = peewee.SqliteDatabase(os.join(PATH,'people.db'))
+db = peewee.SqliteDatabase(os.path.join(PATH,'people.db'))
 
 class Person(peewee.Model):
     name = peewee.CharField(max_length=100)

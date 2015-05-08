@@ -12,25 +12,32 @@ class Action:
     def execute(self):
         action = self.json.get("action")
         data = self.json.get("data")
+        res = None
         if action == "search":
             t.log.info("pre-exec search")
-            self.search(data)
+            res = self.search(data)
         elif action == "fetch":
             t.log.info("pre-exec fetch")
-            self.fetch(data)
+            res = self.fetch(data)
         else:
-            t.log.erro("not action found")
+            t.log.error("not action found")
+        return res
 
     def search(self, data):
         t.log.info("searching")
         persons = Person.select().where(Person.name.contains(data))
+        ui = ""
         for person in persons:
-            t.log.info("id:%s %s %s" %(person.id, person.name, 
-                        person.social_number))
+            ui_ ="id:%s %s %s" %(person.id, person.name, 
+                        person.social_number)
+            ui += ui_  + "\n"
+            t.log.info(ui_)
+        return ui
 
     def fetch(self, id):
         person = Person.get(Person.id==int(id))
         t.log.info(t.red("person"))
-        t.log.info(" %s NS: %s Nombre %s" % (person.id, 
-                person.social_number, person.name))
+        ui = " %s NS: %s Nombre %s" % (person.id, 
+                person.social_number, person.name)
+        return ui
 

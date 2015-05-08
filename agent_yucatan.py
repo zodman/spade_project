@@ -18,6 +18,12 @@ class AgentBase(spade.Agent.Agent):
                 t.log.info(content)
                 act = Action(content)
                 res  = act.execute()
+                reply = self.msg.createReply()
+                d = {'action':'reply', 'data':res}
+                reply.setContent(d)
+                self.myAgent.send(reply)
+            
+
     def _setup(self):
         template = spade.Behaviour.ACLTemplate()
         template.setSender(spade.AID.aid("client@"+host,["xmpp://client@"+host]))

@@ -8,11 +8,12 @@ import json
 host = "127.0.0.1"
 
 class Client(spade.Agent.Agent):
+    default_location = "yucatan"
     def _setup(self):
         self.addBehaviour(self.SendMsgBehav())
         
         template = spade.Behaviour.ACLTemplate()
-        template.setSender(spade.AID.aid("yucatan@"+host,["xmpp://yucatan@"+host]))
+        template.setSender(spade.AID.aid(self.default_location+"@"+host,["xmpp://"+self.default_location+"@"+host]))
         t = spade.Behaviour.MessageTemplate(template)
         
         self.addBehaviour(self.ReciveBehav(), t)
@@ -35,7 +36,8 @@ class Client(spade.Agent.Agent):
         def _process(self):
             msg = spade.ACLMessage.ACLMessage()
             msg.setPerformative("inform")
-            msg.addReceiver(spade.AID.aid("yucatan@"+host,["xmpp://yucatan@"+host]))
+            msg.addReceiver(spade.AID.aid("%s@%s" % (self.myAgent.default_location, host),
+                 ["xmpp://%s@%s" %(self.myAgent.default_location, host)]))
             #data = {'data':'Andres Vargas', 'action':"search"}
             data = {'data':self.myAgent.data, 'action':self.myAgent.action}
             msg.setContent(data)

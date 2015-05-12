@@ -9,14 +9,25 @@ host = "127.0.0.1"
 
 class Client(spade.Agent.Agent):
     default_location = "yucatan"
+
     def _setup(self):
-        self.addBehaviour(self.SendMsgBehav())
-        
         template = spade.Behaviour.ACLTemplate()
         template.setSender(spade.AID.aid(self.default_location+"@"+host,["xmpp://"+self.default_location+"@"+host]))
         t = spade.Behaviour.MessageTemplate(template)
-        
+
+        #self.runBehaviourOnce(self.CheckBehav())
         self.addBehaviour(self.ReciveBehav(), t)
+        self.addBehaviour(self.SendMsgBehav())
+
+    class CheckBehav(spade.Behaviour.OneShotBehaviour):
+        def _process(self):
+            print "check beahv"
+            aad = spade.AMS.AmsAgentDescription()
+            search = self.myAgent.searchAgent(aad)
+            log.info("saerch %s" % search)
+            for a in search:
+                print a.asRDFXML()
+
 
 
     class ReciveBehav(spade.Behaviour.EventBehaviour):
@@ -61,11 +72,14 @@ def main(debug = False, action="search"):
     a.data = data
     time.sleep(1)
     a.start()
-    while True:
+
+    alive = True
+    while alive:
         try:
             time.sleep(1)
         except KeyboardInterrupt:
-            break
+            alive=False
+
     a.stop()
 
 

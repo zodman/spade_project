@@ -25,7 +25,10 @@ class Action:
 
     def search(self, data):
         t.log.info("searching")
-        persons = Person.select().where(Person.name.contains(data))
+        persons = Person.select().where(
+                    Person.name.contains(data)|
+                    Person.social_number.contains(data)
+                )
         ui = ""
         for person in persons:
             ui_ ="id:%s %s %s" %(person.id, person.name, 
